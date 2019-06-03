@@ -3,9 +3,22 @@
 
 import icalendar, re, requests
 
+headers = requests.utils.default_headers()
+headers.update(
+    {
+        'Connection': 'close',
+        'User-Agent': 'Victorinox/0.2 (https://github.com/jprenken/victorinox)'
+    }
+)
+
 def application(environ, start_response):
+    if environ['REQUEST_URI'] is '/':
+        status = '200'
+        response_headers = [('Content-Type', 'text/plain')]
+        start_response(status, response_headers)
+        return [':)\n']
     try:
-        request = requests.get('https://portal.victorops.com%s' % environ['REQUEST_URI'])
+        request = requests.get('https://portal.victorops.com%s' % environ['REQUEST_URI'], headers=headers, timeout=5)
 
         status = str(request.status_code)
 
